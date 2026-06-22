@@ -31,12 +31,13 @@ This project aims to recognize human emotions from facial images using computer 
 
 ```bash
 .
-├── data/               # Dataset files
-├── models/             # Trained model files
-├── notebooks/          # Jupyter notebooks for experimentation
-├── src/                # Source code
-├── README.md
-└── requirements.txt
+├── wieghts/                    # Pretrained model weights (see below)
+│   ├── ckpt_cnn_baseline.pt    # Model 1 — custom CNN baseline
+│   ├── ckpt_cnn_focal_sgd.pt   # Model 2 — custom CNN (focal loss + SGD)
+│   ├── ckpt_mobilenetv2_tl.pt  # Model 3 — MobileNetV2 transfer learning
+│   └── best_fer_model.pt       # Final best model (used for inference)
+├── FER_Colab_Notebook.ipynb    # End-to-end training + inference notebook
+└── README.md
 ```
 
 ## Installation
@@ -91,6 +92,40 @@ Or run the notebook:
 ```bash
 jupyter notebook
 ```
+
+## Pretrained Weights
+
+The [`wieghts/`](wieghts) folder contains the trained weights for **all three models**
+benchmarked in the notebook, plus the final best model:
+
+| File | What it is |
+|------|------------|
+| `ckpt_cnn_baseline.pt`   | Model 1 — custom CNN baseline (AdamW + cosine LR + weighted CE) |
+| `ckpt_cnn_focal_sgd.pt`  | Model 2 — custom CNN (focal loss + SGD + weighted sampler) |
+| `ckpt_mobilenetv2_tl.pt` | Model 3 — MobileNetV2 transfer learning |
+| **`best_fer_model.pt`**  | **Final best model** — self-contained (weights + class names + config); this is the one the inference cells load |
+
+> The three `ckpt_*.pt` files are raw `state_dict`s for each experiment.
+> **`best_fer_model.pt`** is the final pick and is fully self-describing, so
+> inference can rebuild the exact architecture from it.
+
+## Running in Google Colab
+
+1. Open `FER_Colab_Notebook.ipynb` in Google Colab and set
+   **Runtime → Change runtime type → T4 GPU**.
+2. **To retrain from scratch:** just run all cells top to bottom.
+3. **To skip training and run inference with the provided weights:**
+   - Upload the weights into Colab. Easiest is to clone this repo inside Colab:
+     ```python
+     !git clone https://github.com/Rehanabbaxi/Facial-Emotion-Recognition.git
+     ```
+     (or drag the files from `wieghts/` into Colab's file browser under `/content/`).
+   - Point the inference loader at the best model before running the
+     **Section 10 — Inference** cell:
+     ```python
+     SAVE_PATH = '/content/Facial-Emotion-Recognition/wieghts/best_fer_model.pt'
+     ```
+   - Then run the inference cells (Section 10 — upload an image, Section 11 — webcam).
 
 ## Dataset
 
